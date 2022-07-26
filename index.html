@@ -711,32 +711,32 @@
     function getToolTipText(slideNumber, d){
         switch(slideNumber){
             case 1:     // GDP
-                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='images/pres-mini-"+d.Government+".png'></td><td>" + 
                   "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
                   "<b>Year: </b>" + d.Year + "<br>" +
                   "<b>GDP: </b>US$ " + getGDPDescription(d.GDP) + "<br>" + 
                   "<b>Growth: </b> " + parseFloat(d.Growth).toFixed(2) + "%</td></tbody></table>");
                 break;
             case 2:     // Inflation
-                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='images/pres-mini-"+d.Government+".png'></td><td>" + 
                   "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
                   "<b>Year: </b>" + d.Year + "<br>" +
                   "<b>Inflation: </b>" + parseFloat(d.Inflation).toFixed(2) + "%</td></tbody></table>");
                 break;
             case 3:     // Interest Rate
-                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='images/pres-mini-"+d.Government+".png'></td><td>" + 
                   "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
                   "<b>Year: </b>" + d.Year + "<br>" +
                   "<b>Interest Rate: </b>" + parseFloat(d.Rate).toFixed(2) + "%</td></tbody></table>");
                 break;
             case 4:     // Gov. Debt
-                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='images/pres-mini-"+d.Government+".png'></td><td>" + 
                     "<b>President: </b> " + getPresidentName(d.Government) + "<br>" + 
                     "<b>Year: </b>" + d.Year + "<br>" +
                     "<b>Debt: </b>" + parseFloat(d.Debt).toFixed(2) + "% of GDP</td></tbody></table>");
                 break;
             case 5:     // Exchange Rate
-                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='images/pres-mini-"+d.Government+".png'></td><td>" + 
                     "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
                     "<b>Year: </b>" + d.Year + "<br>" +
                     "<b>Exchange Rate: </b>" + "R$ " + parseFloat(d.Exchange).toFixed(2) + " per USD</td></tbody></table>");
