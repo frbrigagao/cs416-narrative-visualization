@@ -1,0 +1,1089 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="styles.css" />
+    <title>How did the last President of Brazil perform against each other according to 5 Economic Indicators?</title>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.5.1/d3-annotation.min.js"></script>
+  </head>
+  <body>
+    <header>
+      <span class="mainTitle">How did the last Presidents of Brazil perform against each other according to 5 economic indicators?</span>
+      <div class="pagination">
+        <ul id="mainMenu">
+          <li><a href="#" id="Slide1" onclick="changeSlide(1)">Gross Domestic Product (GDP)</a></li>
+          <li><a href="#" id="Slide2" onclick="changeSlide(2)">Inflation</a></li>
+          <li><a href="#" id="Slide3" onclick="changeSlide(3)">Interest Rate</a></li>
+          <li><a href="#" id="Slide4" onclick="changeSlide(4)">Government Debt to GDP</a></li>
+          <li><a href="#" id="Slide5" onclick="changeSlide(5)">Exchange Rate</a></li>
+          <li><a href="#" id="buttonNext" onclick="nextSlide()">NEXT ▶</a></li>
+        </ul>
+      </div>
+    <span id="graphDescriptionText" class="graphOrientations"></span> 
+    </header>
+    <main id="my_dataviz"></div>
+    </main>
+    <footer>
+        <div id="tooltip"></div>
+        <span id="orientationText" class="orientations">
+          Use the <b><a href="#" onmouseover="highlightArrows(1)" onmouseleave="highlightArrows(0)" class="tipLink">NEXT BUTTON</a></b> or <img class="keyboardIconSize" src="/images/keyboard_key_left.png"><img class="keyboardIconSize" src="/images/keyboard_key_right.png"> keys to navigate.
+      Hover over data points to view information.</span>
+    </footer>
+  </body>
+  <script>
+    // Parameters
+    var currentSlide    = 1; // Current selected slide
+    var isGraphLoaded   = false; // Checks if a graph was loaded
+    var margin          = { top: 50, right: 150, bottom: 120, left: 150 };
+    const width         = 2000 - margin.left - margin.right;
+    const height        = 800 - margin.top - margin.bottom;
+
+    const csvFiles      = [
+        "data/cleaned/BACEN-4386-GDP-Cleaned.csv",             // 0 - GDP
+        "data/cleaned/IBGE-1737-IPCA-Cleaned.csv",              // 1 - Inflation
+        "data/cleaned/BACEN-1178-SELIC-Cleaned.csv",            // 2 - Interest Rate
+        "data/cleaned/IPEA-DLSP-Cleaned.csv",                   // 3 - Gov. Debt
+        "data/cleaned/BACEN-10813-Exchange Rate-Cleaned.csv",   // 4 - Exchange Rate
+    ];
+    const yAxisDomain = [
+        [0, 3000000],   // 0 - GDP
+        [0, 30],        // 1 - Inflation
+        [0, 50],        // 2 - Interest Rate
+        [0, 80],        // 3 - Gov. Debt
+        [0, 7],         // 4 - Exchange Rate
+    ];
+    const yAxisLabel = [
+        "Gross Domestic Product (US$ Billion)",     // 0 - GDP
+        "Inflation",                                // 1 - Inflation
+        "Basic Interest Rate",                      // 2 - Interest Rate
+        "Government Debt - % of GDP",               // 3 - Gov. Debt
+        "Exchange Rate per US Dollar"               // 4 - Exchange Rate
+    ];
+    const xAxisLabel = "Year";
+
+    // ANNOTATIONS ARRAYS
+    const annotationsGDP = [
+        {
+            note: {
+            label:
+                "Due to currency depreciation and the Asian and Russian Crises, Brazil's GDP plunged over 30%.",
+            title: "Currency Devaluation and Economic Crisis",
+            wrap: 150,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1999, GDP: 599290 },
+            dy: -100,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "Brazil's GDP reached the lowest value in the last year of President Fernando Henrique.",
+            title: "Lowest GDP",
+            wrap: 150,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2002, GDP: 508101 },
+            dy: -80,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "GDP grew from 2002 to 2008 following the commodities boom. After 2008, Brazil felt the impact of the financial crisis.",
+            title: "Commodities Boom",
+            wrap: 150,
+            align: "middle",
+            orientation: "leftRight"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2008, GDP: 1693147 },
+            dy: 0,
+            dx: -150,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "2010's growth was driven by tax cuts, credit expansion and public spending. This formula would be followed by President Dilma.",
+            title: "Taxs Cuts, Credit and Public Spending",
+            wrap: 200,
+            align: "middle",
+            orientation: "leftRight"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2010, GDP: 2209751 },
+            dy: 0,
+            dx: -60,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Dilma tried to keep the economy growing with massive public projects, increasing GDP as a result. The strategy backfired in the next years, leading to stagnation and a recession.",
+            title: "Government Fueled Growth",
+            wrap: 320,
+            align: "middle",
+            orientation: "leftRight"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2011, GDP: 2614482 },
+            dy: -50,
+            dx: 100,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "The pandemic impacted Brazil's economy, which, coupled with currency devaluation, reached 2007-08 levels.",
+            title: "Covid Pandemic",
+            wrap: 160,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2020, GDP: 1447998 },
+            dy: -200,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+    ];
+
+    const annotationsInflation = [
+        {
+            note: {
+            label:
+                "One of the main objectives of President Fernando Henrique was to control Brazil's historically high inflation. The main tool was the basic interest rate.",
+            title: "HyperInflation Control",
+            wrap: 250,
+            align: "middle",
+            orientation: "leftRight"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1995, Inflation: 22.41 },
+            dy: -50,
+            dx: 50,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "Inflation steadily fell during the first term of President Fernando Henrique, reaching its lowest value in 1998.",
+            title: "Lowest Inflation",
+            wrap: 180,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1998, Inflation: 1.65 },
+            dy: -130,
+            dx: -30,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "Prices rose rapidly following the de-indexation of the Brazilian economy and the adoption of a floating currency exchange regime.",
+            title: "De-indexation Inflation",
+            wrap: 260,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1999, Inflation: 8.94 },
+            dy: -120,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "As a result of high exchange rates, inflation rose to 2-digits levels during President Fernando Henrique last year in office.",
+            title: "High Inflation",
+            wrap: 200,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2002, Inflation: 12.53 },
+            dy: -200,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "One of the main objectives of President Lula's first term was to lower inflation. This would be accomplished with high interest rates.",
+            title: "Inflation Control Continues",
+            wrap: 200,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2006, Inflation: 3.14 },
+            dy: -120,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "Following the commodities boom, food prices rose in Brazil, leading to higher inflation, partially contained by the 2008 Financial Crisis.",
+            title: "Food Prices Rise",
+            wrap: 250,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2008, Inflation: 5.9 },
+            dy: -250,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Dilma was unsuccessful in lowering inflation. Questionable economic measures, such as government intervention, and political problems lead to steady high inflation, only controlled following a recession.",
+            title: "Steady Inflation",
+            wrap: 250,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2015, Inflation: 10.67 },
+            dy: -200,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Bolsonaro's first years saw inflation under relative control. However, extremely low interest rates and the COVID pandemic would lead to higher inflation in the last two years.",
+            title: "Lower Inflation",
+            wrap: 300,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2020, Inflation: 4.52 },
+            dy: -80,
+            dx: -130,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "As of June 2022, Brazil's inflation reached 5.49% and is expected to end the year at 6.6%, further reducing the purchasing power of the population.",
+            title: "Inflation makes a come back",
+            wrap: 240,
+            align: "right"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2022, Inflation: 5.49 },
+            dy: -280,
+            dx: -20,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+    ];
+
+    const annotationsInterestRate = [
+    {
+            note: {
+            label:
+                "High interest rates were used to attract foreign capital, control inflation and the exchange rate. This would lead to debt growth.",
+            title: "High Interest Rates",
+            wrap: 280,
+            align: "middle",
+            orientation: "leftRight"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1997, Rate: 40.84 },
+            dy: -50,
+            dx: 50,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "In 2002, interest rates reached the highest value since 1998 as a mechanism to control the 2-digits inflation.",
+            title: "Inflation Control",
+            wrap: 220,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2002, Rate: 24.90 },
+            dy: -50,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Lula managed to lower interest rates during his two terms, in conjunction with steady growth and inflation control. ",
+            title: "Reducing Interest Rates",
+            wrap: 220,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2009, Rate: 8.65 },
+            dy: -100,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "Following the Brazilian economic crisis of 2014-16, the goverment raised interest rates to attract foreign capital and control inflation.",
+            title: "Economic Crisis",
+            wrap: 220,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2015, Rate: 14.15 },
+            dy: -300,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "In the midst of a recession, interest rates were lowered as a mechanism to stimulate the economy.",
+            title: "Recession",
+            wrap: 220,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2018, Rate: 6.40 },
+            dy: -200,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Bolsonaro's government initially implemented lower interest rates, culminating with negative rates (after inflation) in 2020.",
+            title: "Negative Interest Rates",
+            wrap: 220,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2020, Rate: 1.90 },
+            dy: -100,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "However, due to the pandemic and a fastly rising inflation, interest rates were raised again, reaching 2013-14 levels.",
+            title: "COVID Inflation Control",
+            wrap: 200,
+            align: "middle",
+            orientation: "topBottom"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2022, Rate: 13.15 },
+            dy: -150,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+    ];
+
+    const annotationsGovDebt = [
+        {
+            note: {
+            label:
+                "Following liquidity problems caused by the Asian and Russian Crises, Brazil signed a US$ 45 billion loan contract with the IMF.",
+            title: "Asian and Russian Crises (1997-98)",
+            wrap: 250,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 1998, Debt: 38.94 },
+            dy: -100,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "During President Fernando Henrique's last year in office, government debt reached almost 60% of GDP. This would only be surpassed in 2020.",
+            title: "Second Highest Level",
+            wrap: 280,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2002, Debt: 59.93 },
+            dy: -50,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "The economic growth observed from 2003 to 2008 contributed to lowering the ratio between government debt and GDP.",
+            title: "GDP Growth",
+            wrap: 200,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2008, Debt: 37.57 },
+            dy: -80,
+            dx: -40,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "The 2009 subprime crash forced the government to increase spending to maintain GDP, raising government debt.",
+            title: "Subprime Crash",
+            wrap: 290,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2009, Debt: 40.88 },
+            dy: -220,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "GDP growth and lower interest rates helped reduce the debt ratio from 2010 to 2013.",
+            title: "Higher GDP and Lower Rates",
+            wrap: 220,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2013, Debt: 30.5 },
+            dy: -100,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "From 2014 onwards, government debt would rise due to continuing deficits and hindered economic growth.",
+            title: "Recession and Government Deficits",
+            wrap: 220,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2018, Debt: 52.77 },
+            dy: -80,
+            dx: -180,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+        {
+            note: {
+            label:
+                "President Bolsonaro's government spent billions in financial aid, hospitals, vaccines and supplies, raising the debt to GDP ratio to its highest value since 2002.",
+            title: "COVID Spending",
+            wrap: 250,
+            align: "middle"
+            },
+            //can use x, y directly instead of data
+            data: { Year: 2020, Debt: 62.54 },
+            dy: -50,
+            dx: 0,
+            type: d3.annotationLabel,
+            connector: { end: "dot" },
+        },
+    ];
+
+    const annotationsExchangeRate = [
+            {
+              note: {
+                label:
+                  "1995 was the first full year of the new currency Brazilian Real (R$), exchanged at a government fixed rate from 1995 to 1998 as the latest attempt at controlling hyperinflation.",
+                title: "The Real Plan",
+                wrap: 200,
+                align: "left"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 1995, Exchange: 0.9715 },
+              dy: -70,
+              dx: 20,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "In 1999, a floating exchange rate regime was implemented. The currency rapidly depreciated to market value.",
+                title: "Floating Exchange Rate",
+                wrap: 190,
+                align: "left"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 1999, Exchange: 1.7882 },
+              dy: -100,
+              dx: 0,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "During President Fernando Henrique last year in office, the US Dollar rose in value, caused, in part, by the fear resulting from President Lula's election.",
+                title: "Dollar Rises",
+                wrap: 250,
+                align: "left"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 2002, Exchange: 3.5325 },
+              dy: -120,
+              dx: 0,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "Brazil's currency was negatively affected by the 2008 Financial Crisis.",
+                title: "2008 Financial Crisis",
+                wrap: 200,
+                align: "middle"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 2008, Exchange: 2.3362 },
+              dy: -50,
+              dx: 0,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "Overall, Brazil's currency steadily appreciated in value during President Lula's Government.",
+                title: "Steady Appreciation",
+                wrap: 200,
+                align: "middle"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 2010, Exchange: 1.6654 },
+              dy: -200,
+              dx: 0,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "During President Dilma's two terms in office, the currency depreciated in value due to economic and political problems.",
+                title: "Depreciation",
+                wrap: 250,
+                align: "middle"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 2015, Exchange: 3.9042 },
+              dy: -80,
+              dx: 0,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+            {
+              note: {
+                label:
+                  "Brazil's currency value hit an all time low during President Bolsonaro's Government, partially as a result of the COVID pandemic.",
+                title: "Lowest Value",
+                wrap: 280,
+                align: "middle",
+                orientation: "topBottom"
+              },
+              //can use x, y directly instead of data
+              data: { Year: 2021, Exchange: 5.5799 },
+              dy: -20,
+              dx: -100,
+              type: d3.annotationLabel,
+              connector: { end: "dot" },
+            },
+    ];
+
+    const annotations = [
+            annotationsGDP,             // 0 - GDP
+            annotationsInflation,       // 1 - Inflation
+            annotationsInterestRate,    // 2 - Interest Rate
+            annotationsGovDebt,         // 3 - Gov. Debt
+            annotationsExchangeRate     // 4 - Exchange Rate
+    ];
+
+    function getSlideYDataPoint(slideNumber, d){
+        switch(slideNumber){
+            case 1:     // GDP
+                return d.GDP;
+                break;
+            case 2:     // Inflation
+                return d.Inflation;
+                break;
+            case 3:     // Interest Rate
+                return d.Rate;
+                break;
+            case 4:     // Gov. Debt
+                return d.Debt;
+                break;
+            case 5:     // Exchange Rate
+                return d.Exchange;
+                break;
+            default:
+                break;
+        }
+    }
+
+    function getSlideYTickFormat(slideNumber, d){
+        switch(slideNumber){
+            case 1:     // GDP
+                return numberWithCommas(parseFloat(d / 1000).toFixed(0));
+                break;
+            case 2:     // Inflation
+                return parseFloat(d).toFixed(2) + "%";
+                break;
+            case 3:     // Interest Rate
+                return parseFloat(d).toFixed(2) + "%";
+                break;
+            case 4:     // Gov. Debt
+                return parseFloat(d).toFixed(2) + "%";
+                break;
+            case 5:     // Exchange Rate
+                return "R$ " + parseFloat(d).toFixed(2);
+                break;
+            default:
+                break;
+        }
+    }    
+
+    function getSlideYDataLabel(slideNumber, d){
+        return "";
+        switch(slideNumber){
+            case 1:     // GDP
+                if (d.GDP / 1000 >= 1000) {
+                    return ("" + numberWithCommas(parseFloat(d.GDP / 1000 / 1000).toFixed(2)) + " T");
+                } else {
+                    return ("" + numberWithCommas(parseFloat(d.GDP / 1000).toFixed(0)) + " B");
+                }
+                break;
+            case 2:     // Inflation
+                return parseFloat(d.Inflation).toFixed(2) + "%";
+                break;
+            case 3:     // Interest Rate
+                return d.Rate + "%";
+                break;
+            case 4:     // Gov. Debt
+                return parseFloat(d.Debt).toFixed(2) + "%";
+                break;
+            case 5:     // Exchange Rate
+                return "R$ " + parseFloat(d.Exchange).toFixed(2);
+                break;
+            default:
+                break;
+        }
+    }    
+
+    function getToolTipText(slideNumber, d){
+        switch(slideNumber){
+            case 1:     // GDP
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                  "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
+                  "<b>Year: </b>" + d.Year + "<br>" +
+                  "<b>GDP: </b>US$ " + getGDPDescription(d.GDP) + "<br>" + 
+                  "<b>Growth: </b> " + parseFloat(d.Growth).toFixed(2) + "%</td></tbody></table>");
+                break;
+            case 2:     // Inflation
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                  "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
+                  "<b>Year: </b>" + d.Year + "<br>" +
+                  "<b>Inflation: </b>" + parseFloat(d.Inflation).toFixed(2) + "%</td></tbody></table>");
+                break;
+            case 3:     // Interest Rate
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                  "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
+                  "<b>Year: </b>" + d.Year + "<br>" +
+                  "<b>Interest Rate: </b>" + parseFloat(d.Rate).toFixed(2) + "%</td></tbody></table>");
+                break;
+            case 4:     // Gov. Debt
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                    "<b>President: </b> " + getPresidentName(d.Government) + "<br>" + 
+                    "<b>Year: </b>" + d.Year + "<br>" +
+                    "<b>Debt: </b>" + parseFloat(d.Debt).toFixed(2) + "% of GDP</td></tbody></table>");
+                break;
+            case 5:     // Exchange Rate
+                return(  "<table class='tooltip-table'><tbody><tr><td><img class='pres-mini' src='/images/pres-mini-"+d.Government+".png'></td><td>" + 
+                    "<b>President: </b>" + getPresidentName(d.Government) + "<br>" + 
+                    "<b>Year: </b>" + d.Year + "<br>" +
+                    "<b>Exchange Rate: </b>" + "R$ " + parseFloat(d.Exchange).toFixed(2) + " per USD</td></tbody></table>");
+                break;
+            default:
+                break;
+        }
+    }
+
+    function getGraphDescriptionText(slideNumber){
+      switch(slideNumber){
+        case 1:       // GDP
+          return("GDP provides an economic snapshot of a country and is used to estimate the size of an economy and growth rate.");
+          break;
+        case 2:       // Inflation
+          return("Inflation control has been one of the most important objectives of Brazil, which has a history of hyperinflation.");
+          break;
+        case 3:       // Interest Rate
+          return("Interest rates are one of the main tools used by Brazilian Presidents to influence Brazil's economy.");
+          break;
+        case 4:       // Gov. Debt
+          return("The government debt to GDP ratio indicates a country's ability to pay back its debts.");
+          break;
+        case 5:       // Exchange Rate
+          return("The exchange rate to the US Dollar plays a significant role in Brazil in relation to exports and imports.");
+          break;
+        default:
+          break;
+      }
+    }
+
+    function getGDPDescription(value){
+        if (value / 1000 >= 1000) {
+            return ("" + numberWithCommas(parseFloat(value / 1000 / 1000).toFixed(2)) + " trillion");
+        } else {
+            return ("" + numberWithCommas(parseFloat(value / 1000).toFixed(2)) + " billion");
+        }
+    }
+
+    // Start with introduction Slide (Slide 0)
+    changeSlide(1);
+
+    function highlightArrows(param) {
+      if (param == 1) {
+        document.getElementById("buttonNext").classList.add("tip");
+      } else {
+        document.getElementById("buttonNext").classList.remove("tip");
+      }
+    }
+
+    function changeSlide(slideNumber) {
+      document
+        .getElementById("Slide" + currentSlide)
+        .classList.remove("active");
+      document.getElementById("Slide" + slideNumber).classList.add("active");
+      currentSlide = slideNumber;
+      loadSlide(currentSlide);
+    }
+
+    function nextSlide() {
+      if (currentSlide < 5) {
+        changeSlide(currentSlide + 1);
+      }
+    }
+
+    function prevSlide() {
+      if (currentSlide > 1) {
+        changeSlide(currentSlide - 1);
+      }
+    }
+
+    function loadSlide(slide) {
+      if (isGraphLoaded) {
+        d3.selectAll("#my_dataviz > #svgId").remove();
+        document.getElementById("graphDescriptionText").style.display = "none";
+        document.getElementById("graphDescriptionText").innerHTML = "";
+      }
+      loadSVG(slide);
+      isGraphLoaded = true;
+    }
+
+    // MAIN FUNCTION - START
+    function loadSVG(slideNumber) {
+
+      const SlideArrayPosition = slideNumber - 1;
+
+      document.getElementById("graphDescriptionText").innerHTML = getGraphDescriptionText(slideNumber);
+      document.getElementById("graphDescriptionText").style.display = "block";
+
+      var svg = d3.select("#my_dataviz")
+        .append("div")
+        .attr("id", "svgID")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .call(responsivefy)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      d3.csv(csvFiles[SlideArrayPosition], function (data) {
+        
+        // Add X Axis
+        var x = d3.scaleLinear()
+          .range([0, width])
+          .domain(d3.extent(data, (dataPoint) => dataPoint.Year));
+        
+        svg.append("g")
+          .attr("class", "xTicks")
+          .attr("transform", "translate(0," + height + ")")
+          .call(d3.axisBottom(x).ticks(data.length).tickFormat((d, i) => { return d; }))
+          .selectAll("text")
+          .attr("transform", "translate(-10,0)rotate(-45)")
+          .style("text-anchor", "end");
+
+        // Add Y axis 
+        var y = d3.scaleLinear().domain(yAxisDomain[SlideArrayPosition]).range([height, 0]);
+        
+        svg.append("g")
+          .attr("class", "yTicks")
+          .call(d3.axisLeft(y).tickFormat((d, i) => { return getSlideYTickFormat(slideNumber,d); }));
+
+        //Add horizontal gridlines
+        d3.selectAll("g.yTicks g.tick")
+          .append("line")
+          .attr("class", "gridline")
+          .attr("x1", 0)
+          .attr("y1", 0)
+          .attr("x2", width)
+          .attr("y2", 0);
+
+        // Add Axis Labels
+        
+        // X-Axis Label
+        svg.append("text")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 0 - margin.left)
+          .attr("x", 0 - height / 2)
+          .attr("dy", "1em")
+          .style("text-anchor", "middle")
+          .text(yAxisLabel[SlideArrayPosition])
+          .attr("class", "xAxisLabel");
+        
+        //Y-Axis Label
+        svg.append("text")
+          .attr("transform","translate(" + width / 2 + " ," + (height - 20 + margin.bottom) + ")")
+          .style("text-anchor", "middle")
+          .text(xAxisLabel)
+          .attr("class", "yAxisLabel");
+
+        // Load annotations
+
+        const makeAnnotations = d3
+        .annotation()
+        .editMode(false)
+        .notePadding(15)
+        .accessors({
+            x: (d) => x(d.Year),
+            y: (d) => y(getSlideYDataPoint(slideNumber, d)),
+        })
+        .accessorsInverse({
+            date: (d) => timeFormat(x.invert(d.x)),
+            close: (d) => y.invert(d.y),
+        })
+        .annotations(annotations[SlideArrayPosition]);
+
+        //Break dataset into subsets for each government
+        const gov1 = data.filter((d) => d.Year < 2003);
+        const gov2 = data.filter((d) => (d.Year >= 2002) & (d.Year <= 2010));
+        const gov3 = data.filter((d) => (d.Year >= 2010) & (d.Year <= 2016));
+        const gov4 = data.filter((d) => (d.Year >= 2016) & (d.Year <= 2018));
+        const gov5 = data.filter((d) => (d.Year >= 2018) & (d.Year <= 2022));
+
+        //Create an array that will be parsed by the for loop
+        const dataset = [gov1, gov2, gov3, gov4, gov5];
+
+        //For each government, generate corresponding area and line charts
+        for (i = 0; i < 5; i++) {
+          const currentDataset = dataset[i];
+
+          var initialArea = d3.area()
+            .x(function (d) { return x(d.Year);})
+            .y0(height)
+            .y1(height)
+            .curve(d3.curveMonotoneX);
+
+          var area = d3.area()
+            .x(function (d, i) { return x(d.Year); })
+            .y0(height)
+            .y1(function (d) { return y(getSlideYDataPoint(slideNumber,d)); })
+            .curve(d3.curveMonotoneX);
+
+          //Render area chart with animation
+          svg.append("path")
+            .datum(currentDataset)
+            .attr("class", "area_" + (i + 1))
+            .attr("d", initialArea)
+            .transition()
+            .duration(2400)
+            .attr("d", area);
+
+          //Line Animation
+          const transitionPath = d3.transition().ease(d3.easeSin).duration(2000);
+
+          const path = svg.append("path")
+            .datum(currentDataset)
+            .attr("class", "line_" + (i + 1))
+            .attr("d",
+              d3.line()
+                .x(function (d) { return x(d.Year); })
+                .y(function (d) { return y(getSlideYDataPoint(slideNumber,d)); })
+                .curve(d3.curveMonotoneX)
+            );
+
+          path.attr("stroke-dashoffset", path.node().getTotalLength())
+            .attr("stroke-dasharray", path.node().getTotalLength())
+            .transition(transitionPath)
+            .attr("stroke-dashoffset", 0);
+        } // end for loop
+
+        var focusLine = svg.append("g").style("display", "none");
+        focusLine.append("line")
+        .attr("class", "y")
+        .style("stroke", "black")
+        .style("stroke-dasharray", "3,3")
+        .style("stroke-width", "2")
+        .style("opacity", 0.7)
+        .attr("x1", width)
+        .attr("x2", width);
+
+        //Add Tooltip Template
+        var tooltip = d3.select("#svgID")
+          .append("div")
+          .style("opacity", 0)
+          .attr("class", "tooltip");
+
+        var mouseOverPoint = function(d){
+            d3.select(this).transition().duration(300).attr("r",10);
+            tooltip.style("opacity", 1);
+            focusLine.select(".y")
+                .attr("transform",
+                "translate(" + width * -1 + "," +
+                           y(getSlideYDataPoint(slideNumber,d)) + ")")
+                 .attr("x2", width + width);
+                 focusLine.style("display", null);
+        }
+
+        var mouseLeavePoint = function(d){
+            d3.select(this).transition().duration(300).attr("r",5);
+            tooltip.transition().duration(000).style("opacity", 0);
+            focusLine.style("display", "none");
+        }
+
+        var mouseMovePoint = function(d){
+            tooltip.html(getToolTipText(slideNumber,d))
+               .style("left", (d3.event.pageX - 150) + "px") 
+               .style("top", (d3.event.pageY - 180) + "px");
+        }
+
+        //Add circle notation to data points
+        svg.selectAll(".dot")
+          .data(data)
+          .enter()
+          .append("circle") // Uses the enter().append() method
+          .attr("class", "dot") // Assign a class for styling
+          .attr("cx", function (d, i) { return x(d.Year); })
+          .attr("cy", function (d) { return y(getSlideYDataPoint(slideNumber,d)); })
+          .attr("r", 5)
+          .on("mouseover",mouseOverPoint )
+          .on("mousemove", mouseMovePoint  )
+          .on("mouseout", mouseLeavePoint);
+
+        //Add data labels
+        svg.selectAll(".barLabelText")
+          .data(data).enter().append("text")
+          .text(function (d) {return getSlideYDataLabel(slideNumber,d)})
+          .attr("x", function (d) { return x(d.Year); })
+          .attr("y", function (d) { return y(getSlideYDataPoint(slideNumber,d)) - 20; })
+          .attr("class", "barLabelText");
+
+        svg.append("g")
+          .attr("class", "annotation-group")
+          .call(makeAnnotations);
+
+      });
+    } // MAIN FUNCTION
+
+    function getPresidentName(governmentId){
+        switch(parseInt(governmentId)){
+            case 1:
+                return "Fernando Henrique";
+                break;
+            case 2:
+                return "Lula";
+                break;
+            case 3:
+                return "Dilma";
+                break;
+            case 4:
+                return "Temer";
+                break;
+            case 5:
+                return "Bolsonaro";
+                break;
+            default:
+                break;               
+        }
+    }
+
+    function numberWithCommas(x) {
+      return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    function responsivefy(svg) {
+      // get container + svg aspect ratio
+      var container = d3.select(svg.node().parentNode),
+        width = parseInt(svg.style("width")),
+        height = parseInt(svg.style("height")),
+        aspect = width / height;
+
+      // add viewBox and preserveAspectRatio properties,
+      // and call resize so that svg resizes on inital page load
+      svg.attr("viewBox", "0 0 " + width + " " + height)
+        .attr("preserveAspectRatio", "xMinYMid")
+        .call(resize);
+
+      d3.select(window).on("resize." + container.attr("id"), resize);
+
+      // get width of container and resize svg to fit it
+      function resize() {
+        var targetWidth = parseInt(container.style("width"));
+        svg.attr("width", targetWidth);
+        svg.attr("height", Math.round(targetWidth / aspect));
+      }
+    }
+
+    // Add listeners for keyboard presses for arrow keys
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.code == "ArrowLeft") {
+          prevSlide();
+        }
+        if (event.code == "ArrowRight") {
+          nextSlide();
+        }
+      },
+      false
+    );
+  </script>
+</html>

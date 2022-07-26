@@ -1,0 +1,339 @@
+.pagination {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+.tipLink {
+  text-decoration: none;
+  cursor: pointer;
+  color: #04aa6d;
+  padding: 3px;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background-color: #333;
+  width: 100%;
+  text-align: center;
+}
+
+.tip {
+  border-width: 10px;
+  border-color: #04aa6d;
+  border-style: solid;
+  animation: pulsating 3s;
+  animation-iteration-count: infinite;
+}
+
+#buttonNext {
+  background-color: red;
+}
+
+li {
+  display: inline-block;
+}
+
+/* Pagination links */
+li a {
+  display: block;
+  color: white;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+}
+
+li a.active {
+  background-color: #04aa6d;
+  color: white;
+  font-weight: bold;
+}
+
+li a:hover:not(.active) {
+  background-color: #00d486;
+}
+
+.keyboardIconSize{
+  width: 35px;
+  height: auto;
+}
+
+.videoTipSize{
+  height: 80px;
+  width: 140px;
+}
+
+.mainTitle {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  padding: 20px;
+}
+
+.orientations {
+  text-align: center;
+  font-size: 1rem;
+  padding: 5px;
+}
+
+.graphOrientations {
+  text-align: center;
+  font-size: 1.5rem;
+  padding: 5px;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  min-height: 100%;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: Arial, Helvetica, sans-serif;
+  overflow-y: hidden;
+  overflow-x: hidden;
+}
+
+p {
+  font-size: 2rem;
+  padding: 1rem;
+  max-width: 40rem;
+  margin: 2rem auto 4rem auto;
+}
+
+header {
+  width: 100%;
+  align-self: center;
+  position: sticky;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  top: 0;
+}
+
+footer {
+  height: 50px;
+  flex: auto;
+  align-self: center;
+  position: sticky;
+  bottom: 0;
+}
+
+main {
+  flex: auto;
+  margin-right: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  overflow: visible;
+  vertical-align: top;
+}
+
+.svg-container {
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  margin-left: 50px;
+  margin-bottom: 100px;
+  padding-bottom: 100%; /* aspect ratio */
+  vertical-align: top;
+}
+.svg-content-responsive {
+  display: inline-block;
+  position: absolute;
+  top: 0px;
+  left: 0;
+}
+
+.bar_1 {
+  fill: #5495e1;
+}
+.bar_2 {
+  fill: #fb3640;
+}
+.bar_3 {
+  fill: #a62639;
+}
+.bar_4 {
+  fill: #1d3461;
+}
+
+.yAxisLabel,
+.xAxisLabel {
+  font-size: 1.4rem;
+  font-weight: bold;
+}
+
+.yTicks {
+  font-size: 1rem;
+}
+
+.xTicks {
+  font-size: 1.2rem;
+}
+
+.gridline {
+  stroke: steelblue;
+  shape-rendering: crispEdges;
+  stroke-opacity: 0.2;
+}
+
+.barLabelText {
+  font-size: 0.6rem;
+  padding: 2px;
+  fill: black;
+  text-anchor: middle;
+  text-shadow: 0 0 3px white;
+}
+
+.annotation-group {
+  animation: fadeIn 3s;
+  font-size: 0.8rem;
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes pulsating {
+  0% {
+    opacity: 1;
+  }
+  25% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* Style the lines by removing the fill and applying a stroke */
+.line {
+  fill: none;
+  stroke: #ffab00;
+  stroke-width: 3;
+}
+
+.line_1 {
+  fill: none;
+  stroke: #5495e1;
+  stroke-width: 3;
+}
+
+.area_1 {
+  fill: #5495e1;
+  /* fill: url(#img-fhc); */
+  fill-opacity: 0.8;
+  stroke: none;
+}
+
+.line_2 {
+  fill: none;
+  stroke: #fb3640;
+  stroke-width: 3;
+}
+
+.area_2 {
+  fill: #fb3640;
+  fill-opacity: 0.8;
+  stroke: none;
+}
+
+.line_3 {
+  fill: none;
+  stroke: #a62639;
+  stroke-width: 3;
+}
+
+.area_3 {
+  fill: #a62639;
+  fill-opacity: 0.8;
+  stroke: none;
+}
+
+.line_4 {
+  fill: none;
+  stroke: #0e7e39;
+  stroke-width: 3;
+}
+
+.area_4 {
+  fill: #0e7e39;
+  fill-opacity: 0.8;
+  stroke: none;
+}
+
+.line_5 {
+  fill: none;
+  stroke: #1d3461;
+  stroke-width: 3;
+}
+
+.area_5 {
+  fill: #1d3461;
+  fill-opacity: 0.8;
+  stroke: none;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+/* Style the dots by assigning a fill and stroke */
+.dot {
+  fill: #666666;
+  stroke: white;
+  text-shadow: 2px 2px #666666;
+  stroke-width: 3px;
+}
+
+.focus circle {
+  fill: none;
+  stroke: steelblue;
+}
+
+.tooltip {
+  background-color: white;
+  border: solid;
+  border-width: 1px;
+  border-radius: 5px;
+  padding: 8px;
+  position: absolute;
+  font-size: 0.5rem;
+  pointer-events: none;
+}
+
+.pres-mini{
+  width: 100px;
+}
+
+.tooltip-table{
+  width:350px;
+}
+
+.mouseLine{
+  stroke: steelblue;
+  stroke-width: 1px;
+  opacity: 0.5;
+}
